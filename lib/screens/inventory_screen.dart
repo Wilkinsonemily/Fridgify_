@@ -343,9 +343,11 @@ class _InventoryScreenState extends State<InventoryScreen> {
                                   widget.onUsedBudgetChanged(0); // Reset dulu
                                   widget.onUsedBudgetChanged(newTotalSpent); // Kirim total baru
 
-                                  ScaffoldMessenger.of(context).showSnackBar(
-                                    SnackBar(content: Text('${item.name} deleted')),
-                                  );
+                                  if (mounted) {
+                                    ScaffoldMessenger.of(context).showSnackBar(
+                                      SnackBar(content: Text('${item.name} deleted')),
+                                    );
+                                  }
                                 }
                               },
                             ),
