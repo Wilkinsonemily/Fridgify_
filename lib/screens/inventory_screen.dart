@@ -330,11 +330,18 @@ class _InventoryScreenState extends State<InventoryScreen> {
                                         element.name == item.name &&
                                         element.addedOn == item.addedOn);
                                   });
-                                  double parsedPrice = double.tryParse(item.price) ?? 0;
-                                  widget.onUsedBudgetChanged(-parsedPrice);
 
-                                  // Simpan ke database baru
+                                  // Simpan database setelah hapus
                                   await InventoryManager.saveInventory(_allItems);
+
+                                  // ✅ Recalculate total spent
+                                  double newTotalSpent = _allItems.fold(0, (sum, item) {
+                                    double price = double.tryParse(item.price) ?? 0;
+                                    return sum + price;
+                                  });
+
+                                  widget.onUsedBudgetChanged(0); // Reset dulu
+                                  widget.onUsedBudgetChanged(newTotalSpent); // Kirim total baru
 
                                   ScaffoldMessenger.of(context).showSnackBar(
                                     SnackBar(content: Text('${item.name} deleted')),
