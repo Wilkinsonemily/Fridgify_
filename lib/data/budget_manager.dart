@@ -35,31 +35,30 @@ class BudgetSummary {
 }
 
 class BudgetManager {
-  static Future<File> _getBudgetFile() async {
+  static Future<File> _getLocalFile() async {
     final dir = await getApplicationDocumentsDirectory();
     return File('${dir.path}/budget_summary.json');
   }
 
   static Future<void> saveSummary(BudgetSummary summary) async {
-    final file = await _getBudgetFile();
+    final file = await _getLocalFile();
     final jsonData = jsonEncode(summary.toJson());
     await file.writeAsString(jsonData);
   }
 
   static Future<BudgetSummary?> loadSummary() async {
     try {
-      final file = await _getBudgetFile();
-
-      if (!await file.exists()) {
-        return null;
+      final file = await _getLocalFile();
+      if (await file.exists()) {
+        final contents = await file.readAsString();
+        final jsonData = jsonDecode(contents);
+        return BudgetSummary.fromJson(jsonData);
+      } else {
+        return null; // BELUM ADA FILE, return null
       }
-
-      final content = await file.readAsString();
-      final data = jsonDecode(content);
-      return BudgetSummary.fromJson(data);
     } catch (e) {
-      print("Error reading budget summary: $e");
-      return null;
+      print('Error loading budget summary: $e');
+      return null; // ERROR PARSING JUGA return null
     }
   }
 }
