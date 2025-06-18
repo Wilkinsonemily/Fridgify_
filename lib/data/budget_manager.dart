@@ -8,6 +8,7 @@ class BudgetSummary {
   final double avgItemPrice;
   final String month;
   final String currency;
+  final double initialBudget; // ✅ Tambahan ini
 
   BudgetSummary({
     required this.totalSpent,
@@ -15,6 +16,7 @@ class BudgetSummary {
     required this.avgItemPrice,
     required this.month,
     required this.currency,
+    required this.initialBudget, // ✅ Tambahkan ke konstruktor
   });
 
   Map<String, dynamic> toJson() => {
@@ -23,14 +25,16 @@ class BudgetSummary {
     'avgItemPrice': avgItemPrice,
     'month': month,
     'currency': currency,
+    'initialBudget': initialBudget, // ✅ Tambahkan ke JSON
   };
 
   factory BudgetSummary.fromJson(Map<String, dynamic> json) => BudgetSummary(
-    totalSpent: json['totalSpent'],
-    numItems: json['numItems'],
-    avgItemPrice: json['avgItemPrice'],
-    month: json['month'],
-    currency: json['currency'],
+    totalSpent: json['totalSpent'] ?? 0.0,
+    numItems: json['numItems'] ?? 0,
+    avgItemPrice: json['avgItemPrice'] ?? 0.0,
+    month: json['month'] ?? '',
+    currency: json['currency'] ?? 'Rp ',
+    initialBudget: json['initialBudget'] ?? 1000000.0, // ✅ Default fallback
   );
 }
 
