@@ -11,7 +11,7 @@ class InventoryScreen extends StatefulWidget {
 
   const InventoryScreen({
     super.key,
-    required this.onProductAdded, required List<Product> inventoryList,
+    required this.onProductAdded, required List<Product> inventoryList, required Future<void> Function() onInventoryChanged,
   });
 
   @override
@@ -294,7 +294,46 @@ class _InventoryScreenState extends State<InventoryScreen> {
                                     )),
                               ],
                             ),
-                          ),
+                            trailing: IconButton(
+                              icon: const Icon(Icons.delete, color: Colors.red),
+                              onPressed: () async {
+                                // Konfirmasi hapus
+                                final confirm = await showDialog<bool>(
+                                  context: context,
+                                  builder: (ctx) => AlertDialog(
+                                    title: const Text('Delete Item'),
+                                    content: const Text('Are you sure you want to delete this item?'),
+                                    actions: [
+                                      TextButton(
+                                        onPressed: () => Navigator.pop(ctx, false),
+                                        child: const Text('Cancel', style: TextStyle(color: Colors.green)),
+                                      ),
+                                      TextButton(
+                                        onPressed: () => Navigator.pop(ctx, true),
+                                        child: const Text('Delete', style: TextStyle(color: Colors.red)),
+                                      ),
+                                    ],
+                                  ),
+                                );
+
+                                if (confirm == true) {
+                                  setState(() {
+                                    _allItems.removeWhere((element) =>
+                                        element.name == item.name &&
+                                        element.addedOn == item.addedOn);
+                                  });
+
+                                  // Simpan ke database baru
+                                  await InventoryManager.saveInventory(_allItems);
+
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    SnackBar(content: Text('${item.name} deleted')),
+                                  );
+                                }
+                              },
+                            ),
+                          )
+
                         );
                       },
                     ),
