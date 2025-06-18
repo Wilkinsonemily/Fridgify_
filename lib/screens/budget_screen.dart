@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import '../data/budget_manager.dart';
 
 class BudgetScreen extends StatefulWidget {
   final double remainingBudget;
@@ -51,14 +52,22 @@ class _BudgetScreenState extends State<BudgetScreen> {
           ),
           actions: [
             TextButton(
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
-              child: Text('Cancel'),
-            ),
-            TextButton(
-              onPressed: () {
+              onPressed: () async {
+                // Ambil summary lama dulu (agar gak hilang data selain budget)
+                BudgetSummary? oldSummary = await BudgetManager.loadSummary();
+
+                final newSummary = BudgetSummary(
+                  totalSpent: oldSummary?.totalSpent ?? 0.0,
+                  numItems: oldSummary?.numItems ?? 0,
+                  avgItemPrice: oldSummary?.avgItemPrice ?? 0.0,
+                  month: oldSummary?.month ?? DateTime.now().month.toString(),
+                  currency: oldSummary?.currency ?? 'Rp',
+                  initialBudget: totalBudget, // SIMPAN budget baru dari dialog
+                );
+
+                await BudgetManager.saveSummary(newSummary); // Simpan ke file
                 widget.onBudgetChanged(totalBudget - usedBudget, usedBudget);
+
                 Navigator.of(context).pop();
                 setState(() {});
               },
