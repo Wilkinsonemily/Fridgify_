@@ -8,11 +8,17 @@ import 'scanner_screen.dart';
 
 class InventoryScreen extends StatefulWidget {
   final Function(String, String, String, File?, String, String) onProductAdded;
+  final void Function(double) onUsedBudgetChanged;
+
 
   const InventoryScreen({
     super.key,
-    required this.onProductAdded, required List<Product> inventoryList, required Future<void> Function() onInventoryChanged,
+    required this.onProductAdded,
+    required List<Product> inventoryList,
+    required Future<void> Function() onInventoryChanged,
+    required this.onUsedBudgetChanged, // ✅ Tambahan
   });
+
 
   @override
   State<InventoryScreen> createState() => _InventoryScreenState();
@@ -203,6 +209,8 @@ class _InventoryScreenState extends State<InventoryScreen> {
                     if (name.isNotEmpty && expirationDate.isNotEmpty && price.isNotEmpty) {
                       final addedOn = DateTime.now().toString().split(' ')[0];
                       widget.onProductAdded(name, expirationDate, price, image, currency, addedOn);
+                      double parsedPrice = double.tryParse(price) ?? 0;
+                      widget.onUsedBudgetChanged(parsedPrice);
                       Navigator.pop(context);
                       _loadInventory(); // Refresh list
                     }
@@ -322,6 +330,8 @@ class _InventoryScreenState extends State<InventoryScreen> {
                                         element.name == item.name &&
                                         element.addedOn == item.addedOn);
                                   });
+                                  double parsedPrice = double.tryParse(item.price) ?? 0;
+                                  widget.onUsedBudgetChanged(-parsedPrice);
 
                                   // Simpan ke database baru
                                   await InventoryManager.saveInventory(_allItems);
