@@ -1,6 +1,5 @@
 import 'dart:convert';
 import 'dart:io';
-import 'package:path_provider/path_provider.dart';
 
 class BudgetSummary {
   final double totalSpent;
@@ -24,37 +23,14 @@ class BudgetSummary {
         'month': month,
         'currency': currency,
       };
-
-  factory BudgetSummary.fromJson(Map<String, dynamic> json) => BudgetSummary(
-        totalSpent: json['totalSpent'],
-        numItems: json['numItems'],
-        avgItemPrice: json['avgItemPrice'],
-        month: json['month'],
-        currency: json['currency'],
-      );
 }
 
 class BudgetManager {
-  static Future<String> get _localPath async {
-    final dir = await getApplicationDocumentsDirectory();
-    return dir.path;
-  }
-
-  static Future<File> get _budgetFile async {
-    final path = await _localPath;
-    return File('$path/budget_summary.json');
-  }
+  static const String _filePath = 'assets/data/budget_summary.json';
 
   static Future<void> saveSummary(BudgetSummary summary) async {
-    final file = await _budgetFile;
-    final data = jsonEncode(summary.toJson());
-    await file.writeAsString(data);
-  }
-
-  static Future<BudgetSummary?> loadSummary() async {
-    final file = await _budgetFile;
-    if (!await file.exists()) return null;
-    final data = await file.readAsString();
-    return BudgetSummary.fromJson(jsonDecode(data));
+    final file = File(_filePath);
+    final jsonData = jsonEncode(summary.toJson());
+    await file.writeAsString(jsonData);
   }
 }
