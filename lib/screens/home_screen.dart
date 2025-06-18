@@ -8,8 +8,9 @@ import 'scanner_screen.dart';
 import 'user_screen.dart';
 import '../data/inventory_manager.dart';
 import '../data/budget_manager.dart';
-import 'package:intl/intl.dart' show NumberFormat;
+import 'package:intl/intl.dart' show NumberFormat, DateFormat;
 import '../models/inventory_item.dart';
+
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -31,6 +32,30 @@ class _HomeScreenState extends State<HomeScreen> {
       usedBudget = newUsedBudget;
     });
   }
+
+  void updateUsedBudget(double newUsed) async {
+    final summary = await BudgetManager.loadSummary();
+    final initialBudget = summary?.initialBudget ?? 1000000.0;
+
+    if (!mounted) return;
+    setState(() {
+      usedBudget = newUsed;
+      remainingBudget = initialBudget - newUsed;
+    });
+
+    await BudgetManager.saveSummary(
+    BudgetSummary(
+      totalSpent: newUsed,
+      numItems: summary?.numItems ?? 0,
+      avgItemPrice: summary?.avgItemPrice ?? 0,
+      month: summary?.month ?? DateFormat('yyyy-MM').format(DateTime.now()),
+      currency: summary?.currency ?? "IDR",
+      initialBudget: initialBudget,
+    ),
+  );
+
+  }
+
 
   String formatCurrency(double value) {
     final formatter = NumberFormat.simpleCurrency(locale: 'id_ID', name: 'Rp ');
@@ -93,7 +118,7 @@ class _HomeScreenState extends State<HomeScreen> {
       totalSpent: totalSpent,
       numItems: allItems.length,
       avgItemPrice: allItems.isEmpty ? 0 : totalSpent / allItems.length,
-      month: DateTime.now().month.toString(),
+      month: DateFormat('yyyy-MM').format(DateTime.now()),
       currency: currency,
       initialBudget: initialBudget,
     );
@@ -166,7 +191,9 @@ class _HomeScreenState extends State<HomeScreen> {
         inventoryList: _products,
         onProductAdded: _addProductToInventory,
         onInventoryChanged: loadProductsFromJson,
+        onUsedBudgetChanged: updateUsedBudget,
       ),
+
       ScannerScreen(onProductAdded: _addProductToInventory),
       ListScreen(
         productList: _products,
