@@ -73,15 +73,15 @@ class _HomeScreenState extends State<HomeScreen> {
   // }
 
   void _addProductToInventory(
-  String name,
-  String expirationDate,
-  String price,
-  File? image,
-  String currency,
-  String addedOn,
+    String name,
+    String expirationDate,
+    String price,
+    File? image,
+    String currency,
+    String addedOn,
   ) async {
     if (!mounted) return;
-
+  
     setState(() {
       Product? existingProduct = _products.firstWhereOrNull(
         (product) => product.name == name && product.addedOn == addedOn,
@@ -104,7 +104,7 @@ class _HomeScreenState extends State<HomeScreen> {
       }
     });
 
-    // Tambahan penyimpanan ke JSON
+    // 1. Simpan ke file inventory
     final item = InventoryItem(
       name: name,
       expirationDate: expirationDate,
@@ -114,23 +114,37 @@ class _HomeScreenState extends State<HomeScreen> {
       addedOn: addedOn,
     );
     await InventoryManager.addItem(item);
-
+  
+    // 2. Hitung total belanja dari semua item di inventory
     final allItems = await InventoryManager.loadInventory();
-    double total = 0;
+    double totalSpent = 0;
     for (var i in allItems) {
-      total += double.tryParse(i.price) ?? 0;
+      totalSpent += double.tryParse(i.price) ?? 0;
     }
 
-    final summary = BudgetSummary(
-      totalSpent: total,
-      numItems: allItems.length,
-      avgItemPrice: allItems.isEmpty ? 0 : total / allItems.length,
-      month: DateTime.now().month.toString(),
-      currency: currency,
-    );
+  // 3. Load existing budget summary (jika ada)
+  final oldSummary = await BudgetManager.loadSummary();
+  final double initialBudget = oldSummary?.initialBudget ?? 1000000.0;
 
-    await BudgetManager.saveSummary(summary);
+  final summary = BudgetSummary(
+    totalSpent: totalSpent,
+    numItems: allItems.length,
+    avgItemPrice: allItems.isEmpty ? 0 : totalSpent / allItems.length,
+    month: DateTime.now().month.toString(),
+    currency: currency,
+    initialBudget: initialBudget,
+  );
+
+  await BudgetManager.saveSummary(summary);
+
+  // 4. Update UI budget di Home
+  if (mounted) {
+    setState(() {
+      usedBudget = totalSpent;
+      remainingBudget = initialBudget - totalSpent;
+    });
   }
+}
 
   void _onItemTapped(int index) {
     if (!mounted) return;
