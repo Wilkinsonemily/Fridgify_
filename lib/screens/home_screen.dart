@@ -9,6 +9,7 @@ import 'user_screen.dart';
 import '../data/inventory_manager.dart';
 import '../data/budget_manager.dart';
 import 'package:intl/intl.dart' show NumberFormat;
+import '../models/inventory_item.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
