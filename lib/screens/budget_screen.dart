@@ -93,9 +93,7 @@ class _BudgetScreenState extends State<BudgetScreen> {
         title: Text('Budget'),
         leading: IconButton(
           icon: Icon(Icons.arrow_back),
-          onPressed: () {
-            Navigator.pop(context); 
-          },
+          onPressed: () => Navigator.pop(context),
         ),
       ),
       body: Padding(
@@ -149,10 +147,6 @@ class _BudgetScreenState extends State<BudgetScreen> {
               children: [
                 Column(
                   children: [
-                    GestureDetector(
-                      onTap: () => editUsedBudget(100000),
-                      child: Icon(Icons.add, color: Colors.green, size: 15),
-                    ),
                     Text(
                       'Budget Used',
                       style: TextStyle(color: Colors.grey),
@@ -160,10 +154,6 @@ class _BudgetScreenState extends State<BudgetScreen> {
                     Text(
                       formatCurrency(usedBudget),
                       style: TextStyle(fontWeight: FontWeight.bold),
-                    ),
-                    GestureDetector(
-                      onTap: () => editUsedBudget(-100000),
-                      child: Icon(Icons.remove, color: Colors.red, size: 15),
                     ),
                   ],
                 ),
