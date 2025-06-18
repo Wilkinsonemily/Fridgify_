@@ -1,5 +1,6 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
+import 'package:fridgify/screens/home_screen.dart';
 import 'package:image_picker/image_picker.dart';
 import '../data/inventory_manager.dart';
 import '../models/inventory_item.dart';
@@ -10,7 +11,7 @@ class InventoryScreen extends StatefulWidget {
 
   const InventoryScreen({
     super.key,
-    required this.onProductAdded,
+    required this.onProductAdded, required List<Product> inventoryList,
   });
 
   @override
