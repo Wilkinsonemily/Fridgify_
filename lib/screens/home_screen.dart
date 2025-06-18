@@ -193,6 +193,31 @@ class _HomeScreenState extends State<HomeScreen> {
       ),
     );
   }
+  Future<void> loadProductsFromJson() async {
+    final items = await InventoryManager.loadInventory();
+
+    if (!mounted) return;
+
+    setState(() {
+      _products.clear();
+      _products.addAll(items.map((item) => Product(
+        name: item.name,
+        expirationDate: item.expirationDate,
+        price: item.price,
+        image: item.imagePath != null ? File(item.imagePath!) : null,
+        currency: item.currency,
+        checked: false,
+        isInInventory: true,
+        addedOn: item.addedOn,
+      )));
+    });
+  }
+  @override
+  void initState() {
+    super.initState();
+    loadProductsFromJson(); // load saat app dibuka
+  }
+
 }
 
 class HomePage extends StatelessWidget {
