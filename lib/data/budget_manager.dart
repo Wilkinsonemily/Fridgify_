@@ -65,4 +65,21 @@ class BudgetManager {
       return null; // ERROR PARSING JUGA return null
     }
   }
+
+  static Future<void> initializeBudgetIfNeeded() async {
+    final file = await _getLocalFile();
+    if (!(await file.exists())) {
+      // Buat default summary awal dengan budget 50.000
+      final summary = BudgetSummary(
+        totalSpent: 0.0,
+        numItems: 0,
+        avgItemPrice: 0.0,
+        month: DateTime.now().month.toString(),
+        currency: 'Rp',
+        initialBudget: 50000.0,
+      );
+      await saveSummary(summary);
+      print('Budget initialized with Rp 50.000');
+    }
+  }
 }
