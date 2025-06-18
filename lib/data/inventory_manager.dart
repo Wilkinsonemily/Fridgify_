@@ -34,4 +34,11 @@ class InventoryManager {
     final jsonData = items.map((e) => e.toJson()).toList();
     await file.writeAsString(jsonEncode(jsonData));
   }
+
+  static Future<void> saveInventory(List<InventoryItem> items) async {
+    final file = await _getInventoryFile();
+    final jsonData = items.map((e) => e.toJson()).toList();
+    await file.writeAsString(jsonEncode(jsonData));
+  }
+
 }
