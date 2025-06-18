@@ -438,7 +438,8 @@ class _ListScreenState extends State<ListScreen> {
               child: ListView.builder(
                 itemCount: getFilteredList().length,
                 itemBuilder: (context, index) {
-                  var product = getFilteredList()[index];
+                  var product = getFilteredList()[index]; // Simpan dulu di awal
+
                   return Card(
                     margin: EdgeInsets.symmetric(vertical: 8),
                     child: Dismissible(
@@ -452,9 +453,18 @@ class _ListScreenState extends State<ListScreen> {
                       ),
                       onDismissed: (direction) {
                         setState(() {
-                          widget.productList.removeAt(index);
+                          // Pake product yang sudah disimpan
+                          int originalIndex = widget.productList.indexWhere((p) =>
+                              p.name == product.name &&
+                              p.addedOn == product.addedOn);
+
+                          if (originalIndex != -1) {
+                            widget.productList.removeAt(originalIndex);
+                          }
                         });
+
                         _calculateTotal();
+
                         ScaffoldMessenger.of(context).showSnackBar(
                           SnackBar(content: Text('${product.name} deleted')),
                         );
@@ -463,7 +473,7 @@ class _ListScreenState extends State<ListScreen> {
                         leading: product.image != null
                             ? Image.file(product.image!, width: 50, height: 50, fit: BoxFit.cover)
                             : Icon(Icons.image, size: 50),
-                        title: Text(product.name, style: TextStyle(fontWeight: FontWeight.bold, color: Colors.black),),
+                        title: Text(product.name, style: TextStyle(fontWeight: FontWeight.bold, color: Colors.black)),
                         subtitle: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
@@ -578,4 +588,3 @@ class _ListScreenState extends State<ListScreen> {
     );
   }
 }
-
