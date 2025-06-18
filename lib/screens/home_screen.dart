@@ -80,18 +80,15 @@ class _HomeScreenState extends State<HomeScreen> {
     );
     await InventoryManager.addItem(item);
 
-    // Hitung total pengeluaran
+    // Hitung ulang semua item untuk total pengeluaran
     final allItems = await InventoryManager.loadInventory();
-    double totalSpent = 0;
-    for (var i in allItems) {
-      totalSpent += double.tryParse(i.price) ?? 0;
-    }
 
-    // Ambil budget lama (jika ada)
-    final oldSummary = await BudgetManager.loadSummary();
-    final double initialBudget = oldSummary?.initialBudget ?? 1000000.0;
+    double totalSpent = allItems.fold(0, (sum, item) {
+      return sum + (double.tryParse(item.price) ?? 0);
+    });
 
-    // Simpan summary baru
+    final double initialBudget = (await BudgetManager.loadSummary())?.initialBudget ?? 1000000.0;
+
     final summary = BudgetSummary(
       totalSpent: totalSpent,
       numItems: allItems.length,
@@ -103,13 +100,14 @@ class _HomeScreenState extends State<HomeScreen> {
 
     await BudgetManager.saveSummary(summary);
 
-    // Update UI
     if (mounted) {
       setState(() {
         usedBudget = totalSpent;
         remainingBudget = initialBudget - totalSpent;
       });
     }
+
+    // print('✅ Product added: $name, Budget updated. Total Spent: $totalSpent');
   }
 
   void _onItemTapped(int index) {
