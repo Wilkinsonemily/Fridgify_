@@ -254,11 +254,31 @@ class _ManualInputScreenState extends State<ManualInputScreen> {
             Center(
               child: ElevatedButton(
                 onPressed: () {
+                  String name = _productNameController.text.trim();
+                  String expiry = _expireDateController.text.trim();
+                  String purchase = _purchaseDateController.text.trim();
+                  String price = _priceController.text.trim();
+
+                  if (name.isEmpty || expiry.isEmpty || purchase.isEmpty || price.isEmpty) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(content: Text('Please fill in all fields')),
+                    );
+                    return;
+                  }
+
+                  final parsedPrice = double.tryParse(price);
+                  if (parsedPrice == null || parsedPrice < 0) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(content: Text('Please enter a valid price')),
+                    );
+                    return;
+                  }
+
                   widget.onSave(
-                    _productNameController.text,
-                    _expireDateController.text,
-                    _purchaseDateController.text,
-                    _priceController.text,
+                    name,
+                    expiry,
+                    purchase,
+                    price,
                     selectedCurrency,
                     _selectedImage,
                   );
