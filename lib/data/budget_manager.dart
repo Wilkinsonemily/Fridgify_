@@ -1,6 +1,7 @@
 import 'dart:io';
 import 'dart:convert';
 import 'package:path_provider/path_provider.dart';
+import 'package:intl/intl.dart';
 
 class BudgetSummary {
   final double totalSpent;
@@ -74,12 +75,27 @@ class BudgetManager {
         totalSpent: 0.0,
         numItems: 0,
         avgItemPrice: 0.0,
-        month: DateTime.now().month.toString(),
+        month: DateFormat('yyyy-MM').format(DateTime.now()),
         currency: 'Rp',
         initialBudget: 50000.0,
       );
       await saveSummary(summary);
       print('Budget initialized with Rp 50.000');
+    }
+  }
+
+  static Future<void> updateBudgetAfterAdding(double price) async {
+    final summary = await loadSummary();
+    if (summary != null) {
+      final updated = BudgetSummary(
+        totalSpent: summary.totalSpent + price,
+        numItems: summary.numItems + 1,
+        avgItemPrice: (summary.totalSpent + price) / (summary.numItems + 1),
+        month: summary.month,
+        currency: summary.currency,
+        initialBudget: summary.initialBudget,
+      );
+      await saveSummary(updated);
     }
   }
 }
